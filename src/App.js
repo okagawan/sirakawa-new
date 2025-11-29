@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import CountryPicker from "./CountryPicker";
 
-const TIMEOUT_MS = 2 * 60 * 1000; // 2分
+const TIMEOUT_MS = 1 * 40 * 1000; // 40秒
 const FIRST_Q_STEP = 1;
 const LAST_Q_STEP  = 7;            // 1..7 = 7問
 const TOTAL_STEPS  = 7;
@@ -10,7 +10,7 @@ const TOTAL_STEPS  = 7;
 const SUPPORTED_LANGS = ["ja", "en", "zh", "ko", "es"];
 
 /* ── 画面上部の多言語タイトル（言語カード画面のみローテーション） ── */
-const TITLE_ROTATION_MS = 5000; // 5秒ごとに切り替え
+const TITLE_ROTATION_MS = 3000; // 3秒ごとに切り替え
 
 const TITLES = [
   { lang: "ja", text: "白川郷 観光客向けアンケート" },
@@ -871,7 +871,7 @@ export default function App() {
           : [...cleaned, v];
       }
       if (next.length > 0) {
-        scheduleAutoNext(5);
+        scheduleAutoNext(7);
       } else {
         clearAutoNext();
       }
@@ -1172,7 +1172,7 @@ export default function App() {
               onChange={(v) => {
                 setNationality(v);
                 if (v && v.trim().length > 0) {
-                  scheduleAutoNext(5);
+                  scheduleAutoNext(7);
                 } else {
                   clearAutoNext();
                 }
@@ -1249,7 +1249,7 @@ export default function App() {
                           ? prev.filter(v => v !== x)
                           : [...prev, x];
                         if (next.length > 0) {
-                          scheduleAutoNext(5);
+                          scheduleAutoNext(7);
                         } else {
                           clearAutoNext();
                         }
@@ -1327,14 +1327,14 @@ export default function App() {
 
                         if (!usedRentalNext) {
                           if (next.length > 0) {
-                            scheduleAutoNext(5);
+                            scheduleAutoNext(15);
                           } else {
                             clearAutoNext();
                           }
                         } else {
                           // レンタカー利用 ⇒ 借りた場所が未選択の間は自動遷移を止める
                           if (rentalPickup) {
-                            scheduleAutoNext(5);
+                            scheduleAutoNext(7);
                           } else {
                             clearAutoNext();
                           }
@@ -1360,7 +1360,7 @@ export default function App() {
                     const v = e.target.value;
                     setRentalPickup(v);
                     if (v) {
-                      scheduleAutoNext(5);
+                      scheduleAutoNext(7);
                     } else {
                       clearAutoNext();
                     }
