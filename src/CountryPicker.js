@@ -29,7 +29,7 @@ const COUNTRIES = [
   { code:'AU', name:'Australia', flag:'🇦🇺' },
 ];
 
-function CountryPicker({ value, onChange, placeholder='Search country…' }) {
+function CountryPicker({ value, onChange, placeholder='Search country in English…' }) {
   const [q, setQ] = React.useState('');
   const lc = q.trim().toLowerCase();
 

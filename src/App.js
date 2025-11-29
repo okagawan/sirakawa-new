@@ -9,7 +9,7 @@ const TOTAL_STEPS  = 7;
 /* ── 共通ヘルパ／オプション定義 ── */
 const SUPPORTED_LANGS = ["ja", "en", "zh", "ko", "es"];
 
-/* ── 画面上部の多言語タイトル＋背景ローテーション ── */
+/* ── 画面上部の多言語タイトル（言語カード画面のみローテーション） ── */
 const TITLE_ROTATION_MS = 5000; // 5秒ごとに切り替え
 
 const TITLES = [
@@ -20,20 +20,21 @@ const TITLES = [
   { lang: "es", text: "Encuesta para visitantes de Shirakawa-go" },
 ];
 
+/* ★ 言語カード画面用の背景画像（public/images/bg1-4.png） */
+const BG_IMAGES = [
+  "images/bg1.png",
+  "images/bg2.png",
+  "images/bg3.png",
+  "images/bg4.png",
+];
+
+/* 回答画面用の背景グラデーション（1回答中は固定でよい） */
 const BACKGROUNDS = [
   "linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)",
   "linear-gradient(135deg, #fdfcfb 0%, #e2d1f9 100%)",
   "linear-gradient(135deg, #fceabb 0%, #f8b500 100%)",
   "linear-gradient(135deg, #c3cfe2 0%, #f5f7fa 100%)",
   "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
-];
-
-/* ★ 言語カード画面用の背景画像（public/images/bg1-4.png） */
-const BG_IMAGES = [
-  "/images/bg1.png",
-  "/images/bg2.png",
-  "/images/bg3.png",
-  "/images/bg4.png",
 ];
 
 /** options: [{ id, ja, en, zh, ... }, ...] から「ラベル → id」Map を作る */
@@ -610,23 +611,26 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [lang, setLang] = useState("ja"); // "ja" | "en" | "zh" | "ko" | "es"
 
-  /* ★ 言語カード画面用：マウント時に一度だけランダム画像を選ぶ */
-  const [gateBg] = useState(() => {
-    const idx = Math.floor(Math.random() * BG_IMAGES.length);
-    return BG_IMAGES[idx];
-  });
-
-  // タイトル／背景のローテーション
+  // タイトルローテーション（言語カード画面のみ）
   const [titleIndex, setTitleIndex] = useState(0);
-  const [bgIndex, setBgIndex] = useState(0);
 
+  // 言語カード画面用の背景画像（1回答ごとに固定）
+  const [gateBg, setGateBg] = useState(
+    () => BG_IMAGES[Math.floor(Math.random() * BG_IMAGES.length)]
+  );
+  // 回答画面用の背景（1回答ごとに固定）
+  const [answerBg, setAnswerBg] = useState(
+    () => BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)]
+  );
+
+  // 言語カード画面のときだけタイトルをローテーション
   useEffect(() => {
+    if (step !== 0) return;
     const id = setInterval(() => {
       setTitleIndex(prev => (prev + 1) % TITLES.length);
-      setBgIndex(prev => (prev + 1) % BACKGROUNDS.length);
     }, TITLE_ROTATION_MS);
     return () => clearInterval(id);
-  }, []);
+  }, [step]);
 
   // 回答
   const [nationality, setNationality] = useState("");
@@ -655,6 +659,7 @@ export default function App() {
     ja: {
       title: "白川郷アンケート",
       nationality: "国籍（必須）",
+      countryHint: "英字で検索可（例：jap, viet, thai など）。",
       agegroup: "年齢層（必須）",
       discovery: "白川郷を知ったきっかけ（必須・複数選択可）",
       sns: "白川郷を調べるために使ったSNS（必須・複数選択可）",
@@ -674,6 +679,7 @@ export default function App() {
     en: {
       title: "Shirakawa-go Survey",
       nationality: "Nationality (required)",
+      countryHint: "You can search by typing English letters (e.g. “jap”, “viet”, “thai”).",
       agegroup: "Age group (required)",
       discovery: "How did you first learn about Shirakawa-go? (required, multiple)",
       sns: "SNS used to research Shirakawa-go (required, multiple)",
@@ -693,6 +699,7 @@ export default function App() {
     zh: {
       title: "白川乡问卷调查",
       nationality: "国籍（必填）",
+      countryHint: "可以使用英文输入进行搜索（例如：jap、viet、thai 等）。",
       agegroup: "年龄段（必填）",
       discovery: "您是通过什么途径了解到白川乡的？（必填，可多选）",
       sns: "您在查找白川乡相关信息时使用过哪些 SNS？（必填，可多选）",
@@ -712,6 +719,7 @@ export default function App() {
     ko: {
       title: "시라카와고 설문조사",
       nationality: "국적(필수)",
+      countryHint: "알파벳으로 검색할 수 있습니다 (예: jap, viet, thai).",
       agegroup: "연령대(필수)",
       discovery: "시라카와고를 처음 알게 된 계기(필수·복수 선택 가능)",
       sns: "시라카와고 정보를 찾을 때 사용한 SNS(필수·복수 선택 가능)",
@@ -731,6 +739,7 @@ export default function App() {
     es: {
       title: "Encuesta de Shirakawa-go",
       nationality: "Nacionalidad（obligatorio）",
+      countryHint: "Puede buscar escribiendo en letras inglesas (p. ej., “jap”, “viet”, “thai”).",
       agegroup: "Grupo de edad（obligatorio）",
       discovery: "¿Cómo conoció Shirakawa-go por primera vez？（obligatorio・selección múltiple）",
       sns: "Redes sociales que utilizó para informarse sobre Shirakawa-go（obligatorio・selección múltiple）",
@@ -942,6 +951,10 @@ export default function App() {
     setSubmitted(false);
     clearAutoNext();
     lastActivityRef.current = Date.now();
+
+    // 新しい回答開始ごとに背景を取り直す
+    setGateBg(BG_IMAGES[Math.floor(Math.random() * BG_IMAGES.length)]);
+    setAnswerBg(BACKGROUNDS[Math.floor(Math.random() * BACKGROUNDS.length)]);
   }
 
   /* ── 送信 ── */
@@ -1019,7 +1032,7 @@ export default function App() {
       <div
         style={{
           minHeight: "100vh",
-          background: BACKGROUNDS[bgIndex],
+          background: answerBg,
           transition: "background 0.6s ease",
           padding: 16,
           fontFamily: "system-ui, sans-serif"
@@ -1048,54 +1061,80 @@ export default function App() {
     ? Math.max(0, Math.min(1, autoNextSecondsLeft / autoNextTotalSeconds))
     : null;
 
-  /* ── UI本体 ── */
-  const isGate = step === 0;  // 言語カード画面かどうか
+  const isGate = step === 0;
 
+  /* ── UI本体 ── */
   return (
     <div
       style={{
         minHeight: "100vh",
         ...(isGate
           ? {
-              // ★ 最初の言語カード画面だけランダム画像背景
               backgroundImage: `url(${gateBg})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
             }
           : {
-              // ★ それ以外は従来どおりグラデ背景
-              background: BACKGROUNDS[bgIndex],
-              transition: "background 0.6s ease",
+              background: answerBg,
             }),
+        transition: "background 0.6s ease",
         padding: "20px 12px 32px",
         fontFamily: "system-ui, sans-serif"
       }}
     >
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
-        {/* 上部の共通タイトル（多言語ローテーション） */}
+        {/* 上部の共通タイトル */}
         <header style={{ textAlign: "center", marginBottom: 16 }}>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#444",
-              marginBottom: 4
-            }}
-          >
-            {TITLES[titleIndex].lang}
-          </div>
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-              lineHeight: 1.4,
-              margin: 0
-            }}
-          >
-            {TITLES[titleIndex].text}
-          </h1>
+          {isGate ? (
+            <>
+              <div
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "#444",
+                  marginBottom: 4
+                }}
+              >
+                {TITLES[titleIndex].lang}
+              </div>
+              <h1
+                style={{
+                  fontSize: 22,
+                  fontWeight: 700,
+                  lineHeight: 1.4,
+                  margin: 0
+                }}
+              >
+                {TITLES[titleIndex].text}
+              </h1>
+            </>
+          ) : (
+            <>
+              <div
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "#444",
+                  marginBottom: 4
+                }}
+              >
+                {lang.toUpperCase()}
+              </div>
+              <h1
+                style={{
+                  fontSize: 22,
+                  fontWeight: 700,
+                  lineHeight: 1.4,
+                  margin: 0
+                }}
+              >
+                {L.title}
+              </h1>
+            </>
+          )}
         </header>
 
         {/* 中身は従来どおり */}
@@ -1124,7 +1163,7 @@ export default function App() {
             progress={{cur: 1, total: TOTAL_STEPS}}
             nextLabel={L.next}
             nextDisabled={!canNext}
-            onBack={undefined}
+            onBack={() => goToStep(0)}   // 言語選択画面に戻る
             onNext={() => goToStep(2)}
             backLabel={L.back}
           >
@@ -1139,6 +1178,9 @@ export default function App() {
                 }
               }}
             />
+            <p style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+              {L.countryHint}
+            </p>
             {!stepValid(1) && <ReqMsg>{L.requiredMsg}</ReqMsg>}
             {autoNextSecondsLeft != null && step === 1 && stepValid(1) && (
               <AutoNextNotice lang={lang} seconds={autoNextSecondsLeft} mode="next" />
