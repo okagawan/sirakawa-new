@@ -9,6 +9,33 @@ const TOTAL_STEPS  = 7;
 /* ── 共通ヘルパ／オプション定義 ── */
 const SUPPORTED_LANGS = ["ja", "en", "zh", "ko", "es"];
 
+/* ── 画面上部の多言語タイトル＋背景ローテーション ── */
+const TITLE_ROTATION_MS = 5000; // 5秒ごとに切り替え
+
+const TITLES = [
+  { lang: "ja", text: "白川郷 観光客向けアンケート" },
+  { lang: "en", text: "Shirakawa-go Visitor Survey" },
+  { lang: "zh", text: "白川乡 游客问卷调查" },
+  { lang: "ko", text: "시라카와고 관광객 설문조사" },
+  { lang: "es", text: "Encuesta para visitantes de Shirakawa-go" },
+];
+
+const BACKGROUNDS = [
+  "linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)",
+  "linear-gradient(135deg, #fdfcfb 0%, #e2d1f9 100%)",
+  "linear-gradient(135deg, #fceabb 0%, #f8b500 100%)",
+  "linear-gradient(135deg, #c3cfe2 0%, #f5f7fa 100%)",
+  "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
+];
+
+/* ★ 言語カード画面用の背景画像（public/images/bg1-4.png） */
+const BG_IMAGES = [
+  "/images/bg1.png",
+  "/images/bg2.png",
+  "/images/bg3.png",
+  "/images/bg4.png",
+];
+
 /** options: [{ id, ja, en, zh, ... }, ...] から「ラベル → id」Map を作る */
 function buildLabelToIdMap(options) {
   const map = {};
@@ -583,6 +610,24 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [lang, setLang] = useState("ja"); // "ja" | "en" | "zh" | "ko" | "es"
 
+  /* ★ 言語カード画面用：マウント時に一度だけランダム画像を選ぶ */
+  const [gateBg] = useState(() => {
+    const idx = Math.floor(Math.random() * BG_IMAGES.length);
+    return BG_IMAGES[idx];
+  });
+
+  // タイトル／背景のローテーション
+  const [titleIndex, setTitleIndex] = useState(0);
+  const [bgIndex, setBgIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTitleIndex(prev => (prev + 1) % TITLES.length);
+      setBgIndex(prev => (prev + 1) % BACKGROUNDS.length);
+    }, TITLE_ROTATION_MS);
+    return () => clearInterval(id);
+  }, []);
+
   // 回答
   const [nationality, setNationality] = useState("");
   const [agegroup, setAgegroup] = useState("");
@@ -971,7 +1016,15 @@ export default function App() {
     }
 
     return (
-      <div style={{ padding: 16, maxWidth: 700, margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: BACKGROUNDS[bgIndex],
+          transition: "background 0.6s ease",
+          padding: 16,
+          fontFamily: "system-ui, sans-serif"
+        }}
+      >
         <CenteredCard>
           <div>
             <h2 style={{ marginBottom: 12 }}>{title}</h2>
@@ -996,11 +1049,56 @@ export default function App() {
     : null;
 
   /* ── UI本体 ── */
-  return (
-    <>
-      <div style={{ padding: 16, maxWidth: 700, margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
-        <h1>{L.title}</h1>
+  const isGate = step === 0;  // 言語カード画面かどうか
 
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        ...(isGate
+          ? {
+              // ★ 最初の言語カード画面だけランダム画像背景
+              backgroundImage: `url(${gateBg})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }
+          : {
+              // ★ それ以外は従来どおりグラデ背景
+              background: BACKGROUNDS[bgIndex],
+              transition: "background 0.6s ease",
+            }),
+        padding: "20px 12px 32px",
+        fontFamily: "system-ui, sans-serif"
+      }}
+    >
+      <div style={{ maxWidth: 700, margin: "0 auto" }}>
+        {/* 上部の共通タイトル（多言語ローテーション） */}
+        <header style={{ textAlign: "center", marginBottom: 16 }}>
+          <div
+            style={{
+              fontSize: 12,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "#444",
+              marginBottom: 4
+            }}
+          >
+            {TITLES[titleIndex].lang}
+          </div>
+          <h1
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              lineHeight: 1.4,
+              margin: 0
+            }}
+          >
+            {TITLES[titleIndex].text}
+          </h1>
+        </header>
+
+        {/* 中身は従来どおり */}
         {/* 0 言語ゲート */}
         {step === 0 && (
           <CenteredCard>
@@ -1323,7 +1421,7 @@ export default function App() {
 
       {/* 画面下部の残り時間バー */}
       <AutoProgressBar fraction={fraction} />
-    </>
+    </div>
   );
 }
 
