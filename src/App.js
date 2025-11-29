@@ -1286,7 +1286,7 @@ export default function App() {
                   <input
                     type="checkbox"
                     checked={snsUsed.includes(x)}
-                    onChange={() => toggleMulti(x, snsUsed, setSnsUsed, 5)}
+                    onChange={() => toggleMulti(x, snsUsed, setSnsUsed, 10)}
                   />
                   {x}
                 </label>
@@ -1327,7 +1327,7 @@ export default function App() {
 
                         if (!usedRentalNext) {
                           if (next.length > 0) {
-                            scheduleAutoNext(15);
+                            scheduleAutoNext(7);
                           } else {
                             clearAutoNext();
                           }
