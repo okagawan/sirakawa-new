@@ -1472,7 +1472,10 @@ function CenteredCard({ children }) {
   return (
     <div style={{ minHeight: "60vh", display: "grid", placeItems: "center" }}>
       <div style={{
-        width: 520, maxWidth: "92vw", background: "#111", color: "#fff",
+        width: 520, maxWidth: "92vw",
+        background: "rgba(0,0,0,0.55)",   // ★ 半透明
+        backdropFilter: "blur(6px)",      // ★ 追加：背景をぼかす
+        color: "#fff",
         borderRadius: 24, padding: "28px 24px",
         boxShadow: "0 8px 30px rgba(0,0,0,.35)", textAlign: "center"
       }}>
@@ -1487,9 +1490,9 @@ function Section({
   progress, onBack, onNext, nextLabel, nextDisabled, backLabel,
 }) {
   return (
-    <section style={{ marginBottom: 32 }}>
+    <section style={{ marginBottom: 32, fontSize: 17 }}>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <h2 style={{ fontSize: 18, margin: "8px 0 10px" }}>
+        <h2 style={{ fontSize: 18, margin: "8px 0 10px", fontWeight: 700 }}>
           {title} {required && <span style={{ color:"crimson", fontSize: 14 }}>*</span>}
         </h2>
         <div style={{ opacity:.7, fontSize:14 }}>{progress.cur}/{progress.total}</div>
@@ -1545,7 +1548,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
 
   if (lang === "ja") {
     return (
-      <p style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+      <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
         {seconds}秒後に自動的に{isSubmit ? "回答を送信します" : "次のページへ遷移します"}。
         （「戻る」ボタンで戻ることができます）
       </p>
@@ -1553,7 +1556,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
   }
   if (lang === "zh") {
     return (
-      <p style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+      <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
         {seconds}秒后将自动{isSubmit ? "提交您的回答" : "跳转到下一页"}。
         （您可以通过“返回”按钮返回上一页）
       </p>
@@ -1561,7 +1564,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
   }
   if (lang === "ko") {
     return (
-      <p style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+      <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
         {seconds}초 후에 자동으로
         {isSubmit ? " 응답이 전송됩니다" : " 다음 페이지로 이동합니다"}.
         (「뒤로」 버튼으로 이전 화면으로 돌아갈 수 있습니다)
@@ -1570,7 +1573,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
   }
   if (lang === "es") {
     return (
-      <p style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+      <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
         En {seconds} segundos
         {isSubmit ? " se enviarán sus respuestas automáticamente" : " pasaremos automáticamente a la siguiente página"}。
         (Puede volver a la pantalla anterior con el botón “Atrás”)
@@ -1578,7 +1581,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
     );
   }
   return (
-    <p style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+    <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
       We will {isSubmit ? "submit your answers" : "move to the next page"} automatically in {seconds} seconds.
       (You can still go back with the Back button.)
     </p>
