@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import CountryPicker from "./CountryPicker";
 
@@ -22,10 +23,10 @@ const TITLES = [
 
 /* ★ 言語カード画面用の背景画像（public/images/bg1-4.png） */
 const BG_IMAGES = [
-  "images/bg1.png",
-  "images/bg2.png",
-  "images/bg3.png",
-  "images/bg4.png",
+  "/images/bg1.png",
+  "/images/bg2.png",
+  "/images/bg3.png",
+  "/images/bg4.png",
 ];
 
 /* 回答画面用の背景グラデーション（1回答中は固定でよい） */
@@ -59,6 +60,11 @@ function getChoicesForLang(options, lang) {
 }
 
 /* ── 年齢 ── */
+/**
+ * 年齢階級：
+ * - 65–74, 75+ に分けており、日本の「前期／後期高齢者」や
+ *   国際的な 75+ 高齢層区分を意識した構成。
+ */
 const AGE_OPTIONS = [
   {
     id: "age_u18",
@@ -109,12 +115,20 @@ const AGE_OPTIONS = [
     es: "55–64 años",
   },
   {
-    id: "age_65p",
-    ja: "65歳以上",
-    en: "65+",
-    zh: "65岁以上",
-    ko: "65세 이상",
-    es: "65 años o más",
+    id: "age_65_74",
+    ja: "65–74",
+    en: "65–74",
+    zh: "65–74岁",
+    ko: "65–74세",
+    es: "65–74 años",
+  },
+  {
+    id: "age_75p",
+    ja: "75歳以上",
+    en: "75+",
+    zh: "75岁以上",
+    ko: "75세 이상",
+    es: "75 años o más",
   },
 ];
 
@@ -1035,14 +1049,15 @@ export default function App() {
           background: answerBg,
           transition: "background 0.6s ease",
           padding: 16,
-          fontFamily: "system-ui, sans-serif"
+          fontFamily: "system-ui, sans-serif",
+          fontSize: 18,
         }}
       >
         <CenteredCard>
           <div>
-            <h2 style={{ marginBottom: 12 }}>{title}</h2>
-            <p>{msg}</p>
-            <p style={{ marginTop: 16, fontSize: 12, opacity: 0.7 }}>{note}</p>
+            <h2 style={{ marginBottom: 12, fontSize: 22 }}>{title}</h2>
+            <p style={{ fontSize: 18 }}>{msg}</p>
+            <p style={{ marginTop: 16, fontSize: 14, opacity: 0.7 }}>{note}</p>
           </div>
         </CenteredCard>
       </div>
@@ -1080,7 +1095,8 @@ export default function App() {
             }),
         transition: "background 0.6s ease",
         padding: "20px 12px 32px",
-        fontFamily: "system-ui, sans-serif"
+        fontFamily: "system-ui, sans-serif",
+        fontSize: 18,  // ★ 全体的に文字を少し大きく
       }}
     >
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
@@ -1090,7 +1106,7 @@ export default function App() {
             <>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   letterSpacing: "0.2em",
                   textTransform: "uppercase",
                   color: "#444",
@@ -1101,7 +1117,7 @@ export default function App() {
               </div>
               <h1
                 style={{
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: 700,
                   lineHeight: 1.4,
                   margin: 0
@@ -1114,7 +1130,7 @@ export default function App() {
             <>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   letterSpacing: "0.2em",
                   textTransform: "uppercase",
                   color: "#444",
@@ -1125,7 +1141,7 @@ export default function App() {
               </div>
               <h1
                 style={{
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: 700,
                   lineHeight: 1.4,
                   margin: 0
@@ -1137,11 +1153,10 @@ export default function App() {
           )}
         </header>
 
-        {/* 中身は従来どおり */}
         {/* 0 言語ゲート */}
         {step === 0 && (
           <CenteredCard>
-            <h2 style={{ margin: "6px 0 16px", lineHeight: 1.4 }}>
+            <h2 style={{ margin: "6px 0 16px", lineHeight: 1.4, fontSize: 20 }}>
               言語を選んでください / Please select your language / 请选择语言 / 언어를 선택해 주세요 / Elija el idioma
             </h2>
             <div style={{ display: "grid", gap: 12 }}>
@@ -1151,11 +1166,11 @@ export default function App() {
               <button onClick={() => { setLang("ko"); setStep(FIRST_Q_STEP); }} style={gateBtn}>한국어</button>
               <button onClick={() => { setLang("es"); setStep(FIRST_Q_STEP); }} style={gateBtn}>Español</button>
             </div>
-            <div style={{ marginTop: 12, opacity:.6, fontSize:12 }}>Demo mode</div>
+            <div style={{ marginTop: 12, opacity:.6, fontSize:13 }}>Demo mode</div>
           </CenteredCard>
         )}
 
-        {/* 1 国籍 */}
+        {/* 1 国籍（★ このステップだけ上下に Nav と秒数表示） */}
         {step === 1 && (
           <Section
             title={L.nationality}
@@ -1167,6 +1182,18 @@ export default function App() {
             onNext={() => goToStep(2)}
             backLabel={L.back}
           >
+            {/* ★ 上部：残り秒数・Nav を表示 */}
+            {autoNextSecondsLeft != null && step === 1 && stepValid(1) && (
+              <AutoNextNotice lang={lang} seconds={autoNextSecondsLeft} mode="next" />
+            )}
+            <Nav
+              onBack={() => goToStep(0)}
+              onNext={() => goToStep(2)}
+              nextLabel={L.next}
+              nextDisabled={!canNext}
+              backLabel={L.back}
+            />
+
             <CountryPicker
               value={nationality}
               onChange={(v) => {
@@ -1178,17 +1205,19 @@ export default function App() {
                 }
               }}
             />
-            <p style={{ marginTop: 8, fontSize: 12, opacity: 0.8 }}>
+            <p style={{ marginTop: 8, fontSize: 13, opacity: 0.8 }}>
               {L.countryHint}
             </p>
             {!stepValid(1) && <ReqMsg>{L.requiredMsg}</ReqMsg>}
+
+            {/* ★ 下部にも残り秒数表示 */}
             {autoNextSecondsLeft != null && step === 1 && stepValid(1) && (
               <AutoNextNotice lang={lang} seconds={autoNextSecondsLeft} mode="next" />
             )}
           </Section>
         )}
 
-        {/* 2 年齢層 */}
+        {/* 2 年齢層（★ 全選択肢をラジオボタンで表示） */}
         {step === 2 && (
           <Section
             title={L.agegroup}
@@ -1200,24 +1229,28 @@ export default function App() {
             onNext={() => goToStep(3)}
             backLabel={L.back}
           >
-            <select
-              value={agegroup}
-              onChange={(e)=>{
-                const v = e.target.value;
-                setAgegroup(v);
-                if (v) {
-                  scheduleAutoNext(5);
-                } else {
-                  clearAutoNext();
-                }
-              }}
-              style={sel}
-            >
-              <option value="">{L.select}</option>
+            <GridChoices>
               {AGE_CHOICES.map(label => (
-                <option key={label}>{label}</option>
+                <label key={label} style={chkLabel}>
+                  <input
+                    type="radio"
+                    name="agegroup"
+                    value={label}
+                    checked={agegroup === label}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setAgegroup(v);
+                      if (v) {
+                        scheduleAutoNext(5);
+                      } else {
+                        clearAutoNext();
+                      }
+                    }}
+                  />
+                  {label}
+                </label>
               ))}
-            </select>
+            </GridChoices>
             {!stepValid(2) && <ReqMsg>{L.requiredMsg}</ReqMsg>}
             {autoNextSecondsLeft != null && step === 2 && stepValid(2) && (
               <AutoNextNotice lang={lang} seconds={autoNextSecondsLeft} mode="next" />
@@ -1473,11 +1506,12 @@ function CenteredCard({ children }) {
     <div style={{ minHeight: "60vh", display: "grid", placeItems: "center" }}>
       <div style={{
         width: 520, maxWidth: "92vw",
-        background: "rgba(0,0,0,0.55)",   // ★ 半透明
+        background: "rgba(0,0,0,0.35)",   // ★ 半透明
         backdropFilter: "blur(6px)",      // ★ 追加：背景をぼかす
         color: "#fff",
         borderRadius: 24, padding: "28px 24px",
-        boxShadow: "0 8px 30px rgba(0,0,0,.35)", textAlign: "center"
+        boxShadow: "0 8px 30px rgba(0,0,0,.35)", textAlign: "center",
+        fontSize: 18,
       }}>
         {children}
       </div>
@@ -1490,12 +1524,12 @@ function Section({
   progress, onBack, onNext, nextLabel, nextDisabled, backLabel,
 }) {
   return (
-    <section style={{ marginBottom: 32, fontSize: 17 }}>
+    <section style={{ marginBottom: 32, fontSize: 18 }}>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <h2 style={{ fontSize: 18, margin: "8px 0 10px", fontWeight: 700 }}>
-          {title} {required && <span style={{ color:"crimson", fontSize: 14 }}>*</span>}
+        <h2 style={{ fontSize: 20, margin: "8px 0 10px", fontWeight: 700 }}>
+          {title} {required && <span style={{ color:"crimson", fontSize: 16 }}>*</span>}
         </h2>
-        <div style={{ opacity:.7, fontSize:14 }}>{progress.cur}/{progress.total}</div>
+        <div style={{ opacity:.7, fontSize:15 }}>{progress.cur}/{progress.total}</div>
       </div>
 
       <div style={{ marginTop: 12, marginBottom: 12 }}>
@@ -1523,7 +1557,17 @@ function Nav({ onBack, onNext, nextLabel, nextDisabled, backLabel }) {
       marginBottom: 8
     }}>
       {onBack ? (
-        <button onClick={onBack} style={{ padding: "8px 16px" }}>
+        <button
+          onClick={onBack}
+          style={{
+            padding: "10px 18px",
+            fontSize: 16,
+            borderRadius: 9999,
+            border: "1px solid #ccc",
+            background: "#fff",
+            cursor: "pointer",
+          }}
+        >
           {backLabel ?? "戻る"}
         </button>
       ) : <span />}
@@ -1532,7 +1576,16 @@ function Nav({ onBack, onNext, nextLabel, nextDisabled, backLabel }) {
         <button
           onClick={onNext}
           disabled={!!nextDisabled}
-          style={{ padding: "8px 16px", fontWeight: 600 }}
+          style={{
+            padding: "10px 20px",
+            fontSize: 16,
+            fontWeight: 600,
+            borderRadius: 9999,
+            border: "none",
+            background: nextDisabled ? "#ddd" : "#333",
+            color: "#fff",
+            cursor: nextDisabled ? "default" : "pointer",
+          }}
         >
           {nextLabel}
         </button>
@@ -1546,9 +1599,11 @@ function AutoNextNotice({ lang, seconds, mode }) {
   if (seconds == null) return null;
   const isSubmit = mode === "submit";
 
+  const baseStyle = { marginTop: 8, fontSize: 17, opacity: 0.85 };
+
   if (lang === "ja") {
     return (
-      <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
+      <p style={baseStyle}>
         {seconds}秒後に自動的に{isSubmit ? "回答を送信します" : "次のページへ遷移します"}。
         （「戻る」ボタンで戻ることができます）
       </p>
@@ -1556,7 +1611,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
   }
   if (lang === "zh") {
     return (
-      <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
+      <p style={baseStyle}>
         {seconds}秒后将自动{isSubmit ? "提交您的回答" : "跳转到下一页"}。
         （您可以通过“返回”按钮返回上一页）
       </p>
@@ -1564,7 +1619,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
   }
   if (lang === "ko") {
     return (
-      <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
+      <p style={baseStyle}>
         {seconds}초 후에 자동으로
         {isSubmit ? " 응답이 전송됩니다" : " 다음 페이지로 이동합니다"}.
         (「뒤로」 버튼으로 이전 화면으로 돌아갈 수 있습니다)
@@ -1573,7 +1628,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
   }
   if (lang === "es") {
     return (
-      <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
+      <p style={baseStyle}>
         En {seconds} segundos
         {isSubmit ? " se enviarán sus respuestas automáticamente" : " pasaremos automáticamente a la siguiente página"}。
         (Puede volver a la pantalla anterior con el botón “Atrás”)
@@ -1581,7 +1636,7 @@ function AutoNextNotice({ lang, seconds, mode }) {
     );
   }
   return (
-    <p style={{ marginTop: 8, fontSize: 16, opacity: 0.8 }}>
+    <p style={baseStyle}>
       We will {isSubmit ? "submit your answers" : "move to the next page"} automatically in {seconds} seconds.
       (You can still go back with the Back button.)
     </p>
@@ -1595,7 +1650,7 @@ function AutoProgressBar({ fraction }) {
   const clamped = Math.min(Math.max(fraction, 0), 1);
   const progress = 1 - clamped;
 
-  const alpha = 0.15 + 0.55 * progress; // 0.15～0.7
+  const alpha = 0.2 + 0.6 * progress; // 0.2～0.8
   const barColor = `rgba(0, 0, 0, ${alpha})`;
   const widthPercent = progress * 100;
 
@@ -1606,7 +1661,7 @@ function AutoProgressBar({ fraction }) {
         left: 0,
         right: 0,
         bottom: 0,
-        padding: "6px 12px",
+        padding: "8px 12px",
         pointerEvents: "none",
         zIndex: 1000,
       }}
@@ -1618,7 +1673,7 @@ function AutoProgressBar({ fraction }) {
           background: "#f3f3f3",
           borderRadius: 9999,
           overflow: "hidden",
-          height: 8,
+          height: 10,
           boxShadow: "0 0 4px rgba(0,0,0,0.08)",
         }}
       >
@@ -1637,17 +1692,36 @@ function AutoProgressBar({ fraction }) {
 
 /* スタイル */
 const gateBtn = {
-  width: "100%", padding: "14px 16px", borderRadius: 14, border: "1px solid #2a2a2a",
-  background: "#1e1e1e", color: "#fff", fontWeight: 700, cursor: "pointer",
+  width: "100%",
+  padding: "14px 16px",
+  borderRadius: 14,
+  border: "1px solid #2a2a2a",
+  background: "#1e1e1e",
+  color: "#fff",
+  fontWeight: 700,
+  fontSize: 18,
+  cursor: "pointer",
   boxShadow: "0 6px 12px rgba(0,0,0,.35)"
 };
-const sel = { width: "100%", padding: "10px 12px", borderRadius: 12, border: "1px solid #ddd" };
-const chkLabel = { display:"inline-flex", alignItems:"center", gap:8, padding:"6px 8px" };
+const sel = {
+  width: "100%",
+  padding: "10px 12px",
+  borderRadius: 12,
+  border: "1px solid #ddd",
+  fontSize: 16,
+};
+const chkLabel = {
+  display:"inline-flex",
+  alignItems:"center",
+  gap:8,
+  padding:"8px 10px",
+  fontSize: 17,
+};
 const GridChoices = ({children}) => (
   <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:10 }}>
     {children}
   </div>
 );
 const ReqMsg = ({children}) => (
-  <div style={{ color:"crimson", marginTop:6 }}>{children}</div>
+  <div style={{ color:"crimson", marginTop:6, fontSize: 15 }}>{children}</div>
 );
