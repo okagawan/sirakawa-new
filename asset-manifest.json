@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/sirakawa-new/static/css/main.e6c13ad2.css",
-    "main.js": "/sirakawa-new/static/js/main.0835018c.js",
+    "main.js": "/sirakawa-new/static/js/main.22e071f9.js",
     "static/js/453.a6df8470.chunk.js": "/sirakawa-new/static/js/453.a6df8470.chunk.js",
     "index.html": "/sirakawa-new/index.html",
     "main.e6c13ad2.css.map": "/sirakawa-new/static/css/main.e6c13ad2.css.map",
-    "main.0835018c.js.map": "/sirakawa-new/static/js/main.0835018c.js.map",
+    "main.22e071f9.js.map": "/sirakawa-new/static/js/main.22e071f9.js.map",
     "453.a6df8470.chunk.js.map": "/sirakawa-new/static/js/453.a6df8470.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.0835018c.js"
+    "static/js/main.22e071f9.js"
   ]
 }
