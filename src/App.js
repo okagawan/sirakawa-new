@@ -23,10 +23,10 @@ const TITLES = [
 
 /* ★ 言語カード画面用の背景画像（public/images/bg1-4.png） */
 const BG_IMAGES = [
-  "/images/bg1.png",
-  "/images/bg2.png",
-  "/images/bg3.png",
-  "/images/bg4.png",
+  "images/bg1.png",
+  "images/bg2.png",
+  "images/bg3.png",
+  "images/bg4.png",
 ];
 
 /* 回答画面用の背景グラデーション（1回答中は固定でよい） */
