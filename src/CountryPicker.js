@@ -270,7 +270,7 @@ const COUNTRIES = [
 ];
 
 
-function CountryPicker({ value, onChange, placeholder="Search country in English…" }) {
+function CountryPicker({ value, onChange, placeholder="Search country and region in English…" }) {
   const [q, setQ] = React.useState("");
   const lc = q.trim().toLowerCase();
 
@@ -339,7 +339,7 @@ function CountryPicker({ value, onChange, placeholder="Search country in English
           }}
         />
         <div style={{ fontSize:12, color:'#666', marginTop:6 }}>
-          英字で検索可（例：jap，viet，thai など）。
+          英字で検索（例：jap，viet，thai など）できます。
         </div>
       </div>
 
@@ -347,7 +347,7 @@ function CountryPicker({ value, onChange, placeholder="Search country in English
       {!lc && (
         <>
           <div style={{ margin:"14px 0 6px", fontSize:13, color:"#555" }}>
-            よく選ばれる国
+            よく選ばれる国/地域（popular country/region）
           </div>
           <div style={{
             display:"grid",
@@ -362,13 +362,13 @@ function CountryPicker({ value, onChange, placeholder="Search country in English
 
       {/* 全件 */}
       <div style={{ margin:"6px 0", fontSize:13, color:"#555" }}>
-        {lc ? "検索結果" : "すべての国と地域"}
+        {lc ? "検索結果（result）" : "すべての国/地域（all country/region）"}
       </div>
       <div style={{ display:"grid", gap:8 }}>
         {filtered.map((c) => item(c))}
         {filtered.length === 0 && (
           <div style={{ padding:"12px 6px", color:"#777" }}>
-            一致する国が見つかりません。
+            一致する国/地域が見つかりません。
           </div>
         )}
       </div>

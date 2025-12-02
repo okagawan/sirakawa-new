@@ -60,11 +60,6 @@ function getChoicesForLang(options, lang) {
 }
 
 /* ── 年齢 ── */
-/**
- * 年齢階級：
- * - 65–74, 75+ に分けており、日本の「前期／後期高齢者」や
- *   国際的な 75+ 高齢層区分を意識した構成。
- */
 const AGE_OPTIONS = [
   {
     id: "age_u18",
@@ -672,7 +667,7 @@ export default function App() {
   const L = useMemo(() => ({
     ja: {
       title: "白川郷アンケート",
-      nationality: "国籍（必須）",
+      nationality: "国・地域（必須）",
       countryHint: "英字で検索可（例：jap, viet, thai など）。",
       agegroup: "年齢層（必須）",
       discovery: "白川郷を知ったきっかけ（必須・複数選択可）",
@@ -692,7 +687,7 @@ export default function App() {
     },
     en: {
       title: "Shirakawa-go Survey",
-      nationality: "Nationality (required)",
+      nationality: "Country / Region (required)",
       countryHint: "You can search by typing English letters (e.g. “jap”, “viet”, “thai”).",
       agegroup: "Age group (required)",
       discovery: "How did you first learn about Shirakawa-go? (required, multiple)",
@@ -712,7 +707,7 @@ export default function App() {
     },
     zh: {
       title: "白川乡问卷调查",
-      nationality: "国籍（必填）",
+      nationality: "国家／地区（必填）",
       countryHint: "可以使用英文输入进行搜索（例如：jap、viet、thai 等）。",
       agegroup: "年龄段（必填）",
       discovery: "您是通过什么途径了解到白川乡的？（必填，可多选）",
@@ -732,7 +727,7 @@ export default function App() {
     },
     ko: {
       title: "시라카와고 설문조사",
-      nationality: "국적(필수)",
+      nationality: "국가·지역(필수)",
       countryHint: "알파벳으로 검색할 수 있습니다 (예: jap, viet, thai).",
       agegroup: "연령대(필수)",
       discovery: "시라카와고를 처음 알게 된 계기(필수·복수 선택 가능)",
@@ -752,7 +747,7 @@ export default function App() {
     },
     es: {
       title: "Encuesta de Shirakawa-go",
-      nationality: "Nacionalidad（obligatorio）",
+      nationality: "País / región（obligatorio）",
       countryHint: "Puede buscar escribiendo en letras inglesas (p. ej., “jap”, “viet”, “thai”).",
       agegroup: "Grupo de edad（obligatorio）",
       discovery: "¿Cómo conoció Shirakawa-go por primera vez？（obligatorio・selección múltiple）",
@@ -898,10 +893,17 @@ export default function App() {
     const url = "https://api.sheetbest.com/sheets/30286261-7da1-4e92-bc58-dd125a9dea2d";
 
     // JST（UTC+9）でのタイムスタンプ
-    const timestamp_jst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+    const nowJST = new Date(Date.now() + 9 * 60 * 60 * 1000);
+
+    const timestamp_jst = nowJST
       .toISOString()
       .replace("T", " ")
       .replace(/\..+/, "");
+
+    // ソートに使う用：月・日・時（2桁で保存）
+    const month_jst = String(nowJST.getMonth() + 1).padStart(2, "0"); // 01–12
+    const day_jst   = String(nowJST.getDate()).padStart(2, "0");      // 01–31
+    const hour_jst  = String(nowJST.getHours()).padStart(2, "0");     // 00–23
 
     const userAgent =
       typeof navigator !== "undefined" && navigator.userAgent
@@ -910,6 +912,9 @@ export default function App() {
 
     const body = [{
       timestamp_jst,
+      month_jst,
+      day_jst,
+      hour_jst,
 
       status,                      // "complete" | "timeout"
       progress_step: step,         // 1..7
@@ -1106,10 +1111,10 @@ export default function App() {
             <>
               <div
                 style={{
-                  fontSize: 13,
+                  fontSize: 15,
                   letterSpacing: "0.2em",
                   textTransform: "uppercase",
-                  color: "#444",
+                  color: "#f5f5f5",
                   marginBottom: 4
                 }}
               >
@@ -1120,7 +1125,9 @@ export default function App() {
                   fontSize: 24,
                   fontWeight: 700,
                   lineHeight: 1.4,
-                  margin: 0
+                  margin: 0,
+                  color: "#ffffff",
+                  textShadow: "0 2px 6px rgba(0,0,0,0.8)",
                 }}
               >
                 {TITLES[titleIndex].text}
@@ -1170,7 +1177,7 @@ export default function App() {
           </CenteredCard>
         )}
 
-        {/* 1 国籍（★ このステップだけ上下に Nav と秒数表示） */}
+        {/* 1 国・地域 */}
         {step === 1 && (
           <Section
             title={L.nationality}
@@ -1217,7 +1224,7 @@ export default function App() {
           </Section>
         )}
 
-        {/* 2 年齢層（★ 全選択肢をラジオボタンで表示） */}
+        {/* 2 年齢層（ラジオ） */}
         {step === 2 && (
           <Section
             title={L.agegroup}
